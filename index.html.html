@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Le Test des 10 Failles — Bouclier PME</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0E1418;
+  --steel:#2F4858;
+  --paper:#FFFFFF;
+  --wash:#F1F4F6;
+  --line:#D9E0E5;
+  --muted:#5C6C78;
+  --alarm:#C13128;
+  --warn:#D08A16;
+  --safe:#2C7A5B;
+  --accent:#12343B;
+  --shell:#FFFFFF;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ink:#EDF2F4;
+    --steel:#9FB4C0;
+    --paper:#151C21;
+    --wash:#1D262C;
+    --line:#2C383F;
+    --muted:#93A5B0;
+    --alarm:#E4685E;
+    --warn:#E6AC48;
+    --safe:#4FAE84;
+    --accent:#A8D5CE;
+    --shell:#0E1418;
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#EDF2F4;
+  --steel:#9FB4C0;
+  --paper:#151C21;
+  --wash:#1D262C;
+  --line:#2C383F;
+  --muted:#93A5B0;
+  --alarm:#E4685E;
+  --warn:#E6AC48;
+  --safe:#4FAE84;
+  --accent:#A8D5CE;
+  --shell:#0E1418;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  background:var(--shell);
+  color:var(--ink);
+  font-family:"Archivo","Segoe UI",system-ui,-apple-system,sans-serif;
+  font-size:17px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:640px;margin:0 auto;padding:20px 18px 64px;}
+.brandbar{
+  display:flex;align-items:center;gap:10px;
+  padding-bottom:16px;border-bottom:1px solid var(--line);margin-bottom:26px;
+}
+.shield{width:22px;height:26px;flex:none;}
+.brandbar b{font-weight:800;letter-spacing:-0.01em;font-size:15px;}
+.brandbar span{color:var(--muted);font-size:14px;}
+
+/* intro */
+h1{
+  font-size:clamp(30px,8vw,44px);
+  line-height:1.05;
+  font-weight:800;
+  letter-spacing:-0.03em;
+  margin:0 0 18px;
+}
+.lede{font-size:18px;color:var(--muted);margin:0 0 28px;max-width:52ch;}
+.meta{display:flex;gap:22px;margin:0 0 30px;flex-wrap:wrap;}
+.meta div{border-left:3px solid var(--accent);padding-left:11px;}
+.meta strong{display:block;font-size:20px;font-weight:800;}
+.meta small{color:var(--muted);font-size:13px;}
+
+button{font-family:inherit;}
+.btn{
+  display:block;width:100%;border:0;border-radius:10px;
+  background:var(--ink);color:var(--shell);
+  font-size:18px;font-weight:600;padding:16px 20px;cursor:pointer;
+  transition:opacity .15s ease;
+}
+.btn:hover{opacity:.88;}
+.btn:focus-visible{outline:3px solid var(--warn);outline-offset:3px;}
+.btn-ghost{
+  background:transparent;color:var(--muted);border:1px solid var(--line);
+  font-size:15px;padding:12px;margin-top:12px;font-weight:500;
+}
+.btn-wa{background:var(--safe);color:#fff;}
+.btn-buy{
+  background:var(--shell);color:var(--ink);text-decoration:none;
+  text-align:center;box-sizing:border-box;
+}
+.price{
+  margin:12px 0 0;font-size:14px;text-align:center;opacity:.8;
+}
+
+/* quiz */
+.progress{display:flex;gap:4px;margin-bottom:26px;}
+.progress i{flex:1;height:5px;border-radius:3px;background:var(--line);transition:background .25s;}
+.progress i.done{background:var(--accent);}
+.counter{color:var(--muted);font-size:14px;margin:0 0 10px;font-weight:500;}
+.q{
+  font-size:clamp(21px,5.4vw,27px);
+  font-weight:600;line-height:1.28;letter-spacing:-0.015em;
+  margin:0 0 8px;min-height:3em;
+}
+.hint{color:var(--muted);font-size:15px;margin:0 0 26px;}
+.answers{display:grid;gap:12px;}
+.ans{
+  text-align:left;background:var(--paper);border:1.5px solid var(--line);
+  border-radius:10px;padding:17px 19px;font-size:18px;font-weight:600;
+  color:var(--ink);cursor:pointer;display:flex;justify-content:space-between;align-items:center;
+  transition:border-color .15s, background .15s;
+}
+.ans:hover{border-color:var(--accent);}
+.ans:focus-visible{outline:3px solid var(--warn);outline-offset:2px;}
+.ans em{font-style:normal;color:var(--muted);font-size:14px;font-weight:500;}
+.back{
+  background:none;border:0;color:var(--muted);font-size:15px;
+  padding:14px 0 0;cursor:pointer;text-decoration:underline;
+}
+
+/* result */
+.scorebox{
+  border:1.5px solid var(--line);border-radius:12px;
+  background:var(--paper);padding:26px 22px;margin-bottom:24px;
+}
+.gauge{display:flex;align-items:baseline;gap:8px;margin-bottom:14px;}
+.gauge b{font-size:64px;font-weight:800;line-height:1;letter-spacing:-0.04em;}
+.gauge span{font-size:20px;color:var(--muted);font-weight:600;}
+.verdict{font-size:22px;font-weight:800;margin:0 0 8px;letter-spacing:-0.02em;}
+.verdict.r{color:var(--alarm);}
+.verdict.o{color:var(--warn);}
+.verdict.g{color:var(--safe);}
+.bar{height:9px;border-radius:5px;background:var(--wash);overflow:hidden;margin:16px 0 0;}
+.bar i{display:block;height:100%;border-radius:5px;transition:width .6s cubic-bezier(.2,.7,.3,1);}
+h2{font-size:19px;font-weight:800;margin:30px 0 12px;letter-spacing:-0.015em;}
+.fails{display:grid;gap:10px;margin-bottom:8px;}
+.fail{
+  border-left:3px solid var(--alarm);background:var(--wash);
+  padding:13px 15px;border-radius:0 8px 8px 0;font-size:16px;
+}
+.fail b{display:block;font-weight:600;margin-bottom:3px;}
+.fail span{color:var(--muted);font-size:14.5px;}
+.allgood{
+  border-left:3px solid var(--safe);background:var(--wash);
+  padding:15px;border-radius:0 8px 8px 0;font-size:16px;color:var(--muted);
+}
+.pitch{
+  margin:32px 0 18px;padding:24px 22px;border-radius:12px;
+  background:var(--accent);color:var(--shell);
+}
+:root:not([data-theme="light"]) .pitch{color:var(--ink);}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]) .pitch{color:#fff;}}
+:root[data-theme="light"] .pitch{color:#fff;}
+.pitch h3{margin:0 0 10px;font-size:21px;font-weight:800;letter-spacing:-0.02em;}
+.pitch p{margin:0 0 18px;font-size:16px;opacity:.9;}
+.foot{color:var(--muted);font-size:13px;text-align:center;margin-top:34px;line-height:1.6;}
+.hidden{display:none;}
+@media (prefers-reduced-motion: reduce){*{transition:none !important;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="brandbar">
+    <svg class="shield" viewBox="0 0 22 26" fill="none" aria-hidden="true">
+      <path d="M11 1 20 4.5v8.2C20 18.6 16.2 23.2 11 25 5.8 23.2 2 18.6 2 12.7V4.5L11 1Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="M7 12.6l3 3 5-5.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <b>Bouclier PME</b>
+    <span>· Test des 10 failles</span>
+  </div>
+
+  <!-- INTRO -->
+  <section id="intro">
+    <h1>Votre business survivrait-il à un piratage demain matin&nbsp;?</h1>
+    <p class="lede">Dix questions sur vos comptes WhatsApp Business, votre page Facebook Pro et vos données clients. À la fin, vous saurez exactement où sont vos portes ouvertes.</p>
+    <div class="meta">
+      <div><strong>2 min</strong><small>Durée du test</small></div>
+      <div><strong>10</strong><small>Questions</small></div>
+      <div><strong>Gratuit</strong><small>Sans inscription</small></div>
+    </div>
+    <button class="btn" id="start">Commencer le test</button>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="quiz" class="hidden">
+    <div class="progress" id="progress" aria-hidden="true"></div>
+    <p class="counter" id="counter"></p>
+    <p class="q" id="question"></p>
+    <p class="hint" id="hint"></p>
+    <div class="answers">
+      <button class="ans" data-a="yes">Oui <em>c'est en place</em></button>
+      <button class="ans" data-a="no">Non <em>ou je ne sais pas</em></button>
+    </div>
+    <button class="back hidden" id="back">← Question précédente</button>
+  </section>
+
+  <!-- RESULT -->
+  <section id="result" class="hidden">
+    <div class="scorebox">
+      <div class="gauge"><b id="score">0</b><span>/ 10 points de risque</span></div>
+      <p class="verdict" id="verdict"></p>
+      <p id="verdictText" style="margin:0;color:var(--muted);font-size:16px;"></p>
+      <div class="bar"><i id="barFill" style="width:0%"></i></div>
+    </div>
+
+    <h2 id="failsTitle">Vos portes ouvertes</h2>
+    <div class="fails" id="fails"></div>
+
+    <div class="pitch">
+      <h3>Chaque faille est une porte ouverte.</h3>
+      <p>Le Kit Bouclier PME corrige chacune d'elles, étape par étape et sans jargon : WhatsApp Business, Facebook Pro, mots de passe, sauvegarde, départ d'un employé, et la procédure à suivre dans les 30 minutes après un piratage.</p>
+      <a class="btn btn-buy" id="buy" href="#" target="_blank" rel="noopener">Obtenir le Kit Bouclier PME</a>
+      <p class="price" id="price">Téléchargement immédiat · Paiement Mobile Money</p>
+    </div>
+    <button class="btn btn-ghost" id="wa">Une question avant d'acheter ? Écrivez-nous</button>
+
+    <button class="btn btn-ghost" id="restart">Refaire le test</button>
+    <p class="foot">Bouclier PME — sécurité digitale simple pour commerçants et PME.</p>
+  </section>
+
+</div>
+
+<script>
+/* ═══════════ À PERSONNALISER ═══════════
+   1. Colle ici le lien de ta page produit Chariow
+   2. Mets ton numéro WhatsApp (format international, sans + ni espaces)   */
+const CHARIOW_URL     = "https://ofksgwmh.mychariow.store/mon-kit-bouclier-pme";
+const WHATSAPP_NUMBER = "2290153639833";
+/* ═══════════════════════════════════════ */
+
+const QUESTIONS = [
+  { q:"Utilisez-vous un mot de passe différent pour chaque compte professionnel ?",
+    hint:"Email, WhatsApp Business, Facebook Pro, logiciel de caisse.",
+    fail:"Mots de passe réutilisés",
+    why:"Une seule fuite donne accès à tous vos comptes d'un coup." },
+  { q:"La vérification en deux étapes est-elle activée sur WhatsApp Business ?",
+    hint:"Le code PIN à 6 chiffres demandé lors d'une réinstallation.",
+    fail:"WhatsApp Business sans code PIN",
+    why:"Sans ce PIN, une personne qui capte votre SMS reprend votre numéro." },
+  { q:"Pouvez-vous retirer l'accès d'un employé qui part en moins de 5 minutes ?",
+    hint:"Comptes, pages, matériel, email.",
+    fail:"Départ d'employé non maîtrisé",
+    why:"C'est la faille la plus courante : un ancien employé garde l'accès pendant des mois." },
+  { q:"Vos données clients et factures existent-elles ailleurs que sur le PC du bureau ?",
+    hint:"Cloud, disque externe, clé USB gardée à domicile.",
+    fail:"Aucune sauvegarde externe",
+    why:"Un vol, une panne ou un incendie efface tout, définitivement." },
+  { q:"Chaque employé a-t-il son propre compte de connexion ?",
+    hint:"Plutôt qu'un compte unique partagé entre tous.",
+    fail:"Comptes partagés entre employés",
+    why:"Impossible de savoir qui a fait quoi, ni de couper un seul accès." },
+  { q:"Êtes-vous alerté quand quelqu'un se connecte à votre Facebook Pro depuis un nouvel appareil ?",
+    hint:"Les alertes de connexion, dans les paramètres de sécurité.",
+    fail:"Aucune alerte de connexion",
+    why:"Sans alerte, une intrusion peut durer des semaines avant d'être vue." },
+  { q:"Savez-vous reconnaître un message frauduleux visant votre compte pro ?",
+    hint:"« Votre page sera supprimée dans 24h, cliquez ici pour vérifier. »",
+    fail:"Phishing non identifié",
+    why:"La majorité des piratages commencent par un simple clic sur un faux lien." },
+  { q:"Le mot de passe de votre routeur ou box internet a-t-il été changé ?",
+    hint:"Différent de celui d'origine du type admin/admin.",
+    fail:"Routeur en configuration d'usine",
+    why:"Un mot de passe d'usine se trouve en ligne en quelques secondes." },
+  { q:"Avez-vous une procédure écrite à suivre en cas de piratage ?",
+    hint:"Un document que n'importe qui peut appliquer, même sans vous.",
+    fail:"Aucune procédure d'urgence",
+    why:"Les premières minutes décident si vous récupérez le compte ou non." },
+  { q:"Changez-vous vos mots de passe professionnels au moins une fois par an, ou après un événement suspect ?",
+    hint:"Départ d'un employé, message suspect, fuite de données annoncée.",
+    fail:"Mots de passe jamais renouvelés",
+    why:"Un mot de passe ancien a eu des années pour fuiter sans que vous le sachiez." }
+];
+
+const $ = id => document.getElementById(id);
+let index = 0;
+let answers = [];
+
+function buildProgress(){
+  $('progress').innerHTML = QUESTIONS.map(()=>'<i></i>').join('');
+}
+function paintProgress(){
+  [...$('progress').children].forEach((el,i)=>{
+    el.classList.toggle('done', i < index);
+  });
+}
+function render(){
+  const item = QUESTIONS[index];
+  $('counter').textContent = `Question ${index+1} sur ${QUESTIONS.length}`;
+  $('question').textContent = item.q;
+  $('hint').textContent = item.hint;
+  $('back').classList.toggle('hidden', index === 0);
+  paintProgress();
+}
+function answer(val){
+  answers[index] = val;
+  if(index < QUESTIONS.length - 1){
+    index++;
+    render();
+  } else {
+    showResult();
+  }
+}
+function showResult(){
+  const failed = QUESTIONS.filter((_,i)=> answers[i] === 'no');
+  const score = failed.length;
+  $('quiz').classList.add('hidden');
+  $('result').classList.remove('hidden');
+  $('score').textContent = score;
+
+  const v = $('verdict'), vt = $('verdictText'), bar = $('barFill');
+  v.className = 'verdict';
+  if(score >= 7){
+    v.classList.add('r'); v.textContent = 'Danger critique';
+    vt.textContent = "Votre entreprise est une cible facile. Plusieurs failles peuvent être exploitées dès aujourd'hui.";
+    bar.style.background = 'var(--alarm)';
+  } else if(score >= 4){
+    v.classList.add('o'); v.textContent = 'Vulnérable';
+    vt.textContent = "Des failles importantes restent ouvertes et méritent d'être corrigées cette semaine.";
+    bar.style.background = 'var(--warn)';
+  } else {
+    v.classList.add('g'); v.textContent = 'Plutôt solide';
+    vt.textContent = "Vos bases tiennent. Il reste quelques ajustements pour fermer complètement la porte.";
+    bar.style.background = 'var(--safe)';
+  }
+  requestAnimationFrame(()=>{ bar.style.width = (score*10) + '%'; });
+
+  const box = $('fails');
+  if(score === 0){
+    $('failsTitle').textContent = 'Aucune faille détectée';
+    box.innerHTML = '<div class="allgood">Vous avez répondu oui aux dix questions. Refaites le test après chaque changement dans votre équipe ou votre matériel.</div>';
+  } else {
+    $('failsTitle').textContent = score === 1 ? 'Votre porte ouverte' : `Vos ${score} portes ouvertes`;
+    box.innerHTML = failed.map(f => `<div class="fail"><b>${f.fail}</b><span>${f.why}</span></div>`).join('');
+  }
+
+  // Le score est passé à Chariow en paramètre : utile pour savoir
+  // quel niveau de risque achète le plus.
+  $('buy').href = `${CHARIOW_URL}?src=test10&score=${score}`;
+
+  $('wa').onclick = () => {
+    const msg = `Bonjour, je viens de faire le Test des 10 Failles. Mon score est de ${score}/10 points de risque et j'ai une question sur le Kit Bouclier PME.`;
+    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener');
+  };
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+buildProgress();
+$('start').onclick = () => {
+  $('intro').classList.add('hidden');
+  $('quiz').classList.remove('hidden');
+  render();
+};
+document.querySelectorAll('.ans').forEach(b=>{
+  b.onclick = () => answer(b.dataset.a);
+});
+$('back').onclick = () => { if(index>0){ index--; render(); } };
+$('restart').onclick = () => {
+  index = 0; answers = [];
+  $('result').classList.add('hidden');
+  $('intro').classList.remove('hidden');
+  window.scrollTo({top:0});
+};
+</script>
+</body>
+</html>
